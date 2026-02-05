@@ -2,13 +2,41 @@ on:
   pull_request_target:
     types: [ opened ]
 name: Pull Requests
+permissions:
+  checks: write
+  contents: write
+  packages: read
 jobs:
   pullRequestHandler:
     name: PullRequestHandler
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@main
-    - name: PullRequestHandler
-      uses: ScoopInstaller/GithubActions@main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_PULLREQUESTHANDLER}}
+      - uses: actions/checkout@main
+      - name: PullRequestHandler
+        uses: ScoopInstaller/GithubActions@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
+
+  gather_status_pullRequestHandler:
+    runs-on: ubuntu-latest
+    name: Gather Status for pullRequestHandler
+    needs: pullRequestHandler
+    if: always()
+    steps:
+      - name: Gather Status
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_PULLREQUESTHANDLER}}
+          send_job_status: "true"
+          debug: "true"
