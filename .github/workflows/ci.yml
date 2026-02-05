@@ -13,7 +13,7 @@ permissions:
 jobs:
   test_powershell:
     name: WindowsPowerShell
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
