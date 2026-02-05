@@ -20,14 +20,14 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_EXCAVATE }}
+          app_token: ${{secrets.IR_API_KEY_EXCAVATE}}
 
       - uses: actions/checkout@v4
 
       - name: Excavate
         uses: ScoopInstaller/GithubActions@main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           SKIP_UPDATED: '1'
 
       - name: Cleanup PSE
@@ -47,6 +47,6 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_EXCAVATE }}
+          app_token: ${{secrets.IR_API_KEY_EXCAVATE}}
           send_job_status: "true"
           debug: "true"
