@@ -5,11 +5,21 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  checks: write
+  contents: write
+  packages: read
+
 jobs:
   test_powershell:
     name: WindowsPowerShell
     runs-on: windows-latest
     steps:
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_TEST_POWERSHELL}}
       - name: Checkout Bucket
         uses: actions/checkout@main
         with:
@@ -26,10 +36,35 @@ jobs:
           $env:SCOOP_HOME="$(Resolve-Path '.\scoop_core')"
           .\scoop_core\test\bin\init.ps1
           .\my_bucket\bin\test.ps1
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
+
+  gather_status_test_powershell:
+    runs-on: ubuntu-latest
+    name: Gather Status for test_powershell
+    needs: test_powershell
+    if: always()
+    steps:
+      - name: Gather Status
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_TEST_POWERSHELL}}
+          send_job_status: "true"
+          debug: "true"
+
   test_pwsh:
     name: PowerShell
     runs-on: windows-latest
     steps:
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_TEST_PWSH}}
       - name: Checkout Bucket
         uses: actions/checkout@main
         with:
@@ -46,3 +81,22 @@ jobs:
           $env:SCOOP_HOME="$(Resolve-Path '.\scoop_core')"
           .\scoop_core\test\bin\init.ps1
           .\my_bucket\bin\test.ps1
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
+
+  gather_status_test_pwsh:
+    runs-on: ubuntu-latest
+    name: Gather Status for test_pwsh
+    needs: test_pwsh
+    if: always()
+    steps:
+      - name: Gather Status
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_TEST_PWSH}}
+          send_job_status: "true"
+          debug: "true"
