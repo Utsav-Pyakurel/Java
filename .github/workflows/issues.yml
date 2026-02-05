@@ -1,15 +1,44 @@
 on:
   issues:
     types: [ opened, labeled ]
+    
 name: Issues
+permissions:
+  checks: write
+  contents: write
+  packages: read
 jobs:
   issueHandler:
     name: IssueHandler
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@main
-    - name: IssueHandler
-      uses: ScoopInstaller/GithubActions@main
-      if: github.event.action == 'opened' || (github.event.action == 'labeled' && contains(github.event.issue.labels.*.name, 'verify'))
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_ISSUEHANDLER}}
+      - uses: actions/checkout@main
+      - name: IssueHandler
+        uses: ScoopInstaller/GithubActions@main
+        if: github.event.action == 'opened' || (github.event.action == 'labeled' && contains(github.event.issue.labels.*.name, 'verify'))
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
+
+  gather_status_issueHandler:
+    runs-on: ubuntu-latest
+    name: Gather Status for issueHandler
+    needs: issueHandler
+    if: always()
+    steps:
+      - name: Gather Status
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY_ISSUEHANDLER}}
+          send_job_status: "true"
+          debug: "true"
