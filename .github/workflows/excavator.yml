@@ -13,7 +13,7 @@ permissions:
 jobs:
   excavate:
     name: Excavate
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Setup PSE
